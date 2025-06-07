@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>GlassClock</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="glass-topbar">
+    <button class="menu-btn">
+      <span class="menu-icon">&#9776;</span>
+      <span class="menu-label">Menu</span>
+    </button>
+    <div class="clock" id="clock"></div>
+    <button class="settings-btn" id="settingsBtn">
+      <span class="settings-icon">&#9881;</span>
+    </button>
+  </div>
+
+  <!-- Einstellungs-Modal -->
+  <div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+      <label for="timezone">Ort / Zeitzone:</label>
+      <select id="timezone">
+        <option value="Europe/Berlin">Berlin</option>
+        <option value="Europe/London">London</option>
+        <option value="America/New_York">New York</option>
+        <option value="Asia/Tokyo">Tokio</option>
+        <!-- Weitere Zeitzonen nach Bedarf -->
+      </select>
+      <button id="closeSettings">Schließen</button>
+    </div>
+  </div>
+
+  <div class="glass-box">
+    <button onclick="switchMode()">🕒 Modus wechseln</button>
+    <h1 id="title">Uhr</h1>
+    <div id="clockDisplay">--:--:--</div>
+    <div id="stopwatchControls" style="display:none;">
+      <button onclick="startStopwatch()">Start</button>
+      <button onclick="stopStopwatch()">Stop</button>
+      <button onclick="resetStopwatch()">Reset</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+let timezone = localStorage.getItem('timezone') || 'Europe/Berlin';
+
+function updateClock() {
+  const now = new Date();
+  try {
+    const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: timezone };
+    document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('de-DE', options);
+  } catch {
+    document.getElementById('clockDisplay').textContent = now.toLocaleTimeString();
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+document.getElementById('settingsBtn').onclick = () => {
+  document.getElementById('settingsModal').classList.add('active');
+  document.getElementById('timezone').value = timezone;
+};
+document.getElementById('closeSettings').onclick = () => {
+  document.getElementById('settingsModal').classList.remove('active');
+};
+document.getElementById('timezone').onchange = (e) => {
+  timezone = e.target.value;
+  localStorage.setItem('timezone', timezone);
+  updateClock();
+};
+</script>
+</body>
+</html>
