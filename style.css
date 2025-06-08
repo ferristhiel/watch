@@ -48,15 +48,47 @@ body {
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0 24px;
+  justify-content: space-between;
+  padding: 0 8px;
   z-index: 100;
   box-shadow: 0 2px 16px rgba(31, 38, 135, 0.1);
-  gap: 16px;
+  gap: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.theme-switch {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* kleiner Abstand, damit Mond näher am Toggle ist */
+}
+
+.theme-switch .icon:last-child {
+  margin-left: 0; /* wirklich kein Abstand mehr */
+}
+
+.settings-btn {
+  margin-left: 10px; /* leicht links vom Theme-Switch */
 }
 
 #toggleTheme {
   display: none;
+}
+
+#toggleTheme:checked + .toggle-label .slider {
+  transform: translateX(20px);
+}
+
+/* Light-Mode-Klasse für den Body */
+body.light {
+  --bg: #f0f0f0;
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --text: #111;
 }
 
 .toggle-label {
@@ -67,6 +99,8 @@ body {
   border-radius: 20px;
   cursor: pointer;
   display: inline-block;
+  margin-right: 0;   /* kein zusätzlicher Abstand zum Mond */
+  margin-left: 0;    /* kein zusätzlicher Abstand zur Sonne */
 }
 
 .toggle-label .slider {
@@ -84,15 +118,73 @@ body {
   transform: translateX(20px);
 }
 
+.slide-box {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  transition: opacity 0.5s, transform 0.5s;
+  opacity: 1;
+  z-index: 2;
+}
+
+.glassbox-wrapper {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* jetzt wirklich vertikal und horizontal mittig */
+}
+
 .glass-box {
-  margin-top: 80px;
+  position: relative;
+  left: 0;
+  top: 0;
+  transform: none;
+  min-width: 320px;
+  max-width: 400px;
+  width: 90vw;
+  min-height: 340px;
   background: var(--glass-bg);
   backdrop-filter: blur(14px);
   border-radius: 16px;
-  padding: 30px;
+  padding: 30px 20px 30px 20px;
   text-align: center;
   box-shadow: 0 0 20px rgba(31, 38, 135, 0.2);
-  min-width: 260px;
+  transition: transform 0.5s cubic-bezier(.77,0,.18,1), opacity 0.5s;
+  opacity: 1;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* jetzt auch vertikal mittig */
+}
+
+.glass-box.slide-out-left {
+  transform: translateX(-120vw);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glass-box.slide-in-right {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.glass-box.slide-in-from-right {
+  transform: translateX(120vw);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glass-box.slide-in-from-right.slide-in-right {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 button {
@@ -119,7 +211,7 @@ body.light button {
   border: none;
   color: var(--text);
   cursor: pointer;
-  margin-right: 16px;
+  margin-right: 0; /* Abstand entfernt */
   font-size: 1rem;
 }
 
@@ -146,25 +238,38 @@ body.light button {
   color: var(--text);
   cursor: pointer;
   font-size: 1.5rem;
-  margin-left: 8px;
+  margin-left: 0; /* kein Abstand mehr nötig */
 }
 
 .settings-modal {
-  display: none;
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 54px; /* direkt unter der Topbar */
+  left: 60px; /* Abstand zum linken Rand, ggf. anpassen */
+  min-width: 220px;
   background: var(--glass-bg);
   backdrop-filter: blur(14px);
   border-radius: 16px;
   padding: 24px 32px;
   box-shadow: 0 0 20px rgba(31, 38, 135, 0.2);
   z-index: 200;
+  transition: opacity 0.3s ease;
 }
 
 .settings-modal.active {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 600px) {
+  .settings-modal {
+    left: 8px;
+    right: 8px;
+    min-width: unset;
+    width: auto;
+  }
 }
 
 .settings-content label,
@@ -173,3 +278,76 @@ body.light button {
   display: block;
   margin-bottom: 12px;
 }
+
+#stopwatchControls,
+#countdownControls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 10px;
+  margin-top: 40px;
+  width: 100%;
+}
+
+.button-row button {
+  flex: 1 1 0;
+  min-width: 70px;
+  max-width: 120px;
+}
+
+.countdown-arrow {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--glass-bg);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5em;
+  color: var(--text);
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: background 0.2s;
+  z-index: 3;
+}
+.countdown-arrow:hover {
+  background: rgba(58, 141, 222, 0.3);
+}
+
+.time-picker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 18px 0 0 0;
+}
+
+.cd-select {
+  font-size: 1.2em;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #3a8dde;
+  background: rgba(255,255,255,0.15);
+  color: var(--text);
+  outline: none;
+  transition: box-shadow 0.2s, border 0.2s;
+  box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+  appearance: none;
+  scrollbar-width: thin;
+  max-height: 2.2em;
+}
+
+.cd-select:focus {
+  border: 1.5px solid #3a8dde;
+  box-shadow: 0 0 8px #3a8dde44;
+}
+
+.cd-sep {
+  font-size: 1.3em;
+  color: #3a8dde;}
